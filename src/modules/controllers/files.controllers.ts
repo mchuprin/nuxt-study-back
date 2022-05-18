@@ -10,14 +10,15 @@ module.exports.getFiles = async (req: any, res: any) => {
     }).then((value: any) => res.send(value))
 }
 
-module.exports.saveFiles = (req: any, res: any) => {
+module.exports.saveFiles = async (req: any, res: any) => {
   const { files } = req;
-  Object.values(files).forEach((file: any) => {
-    fs.appendFile(`./public/${uid()}${path.extname(file.name)}`, file.data, ((err: any) => Error(err)))
-  })
-  new Promise((resolve) => {
-    fs.readdir('public', (err: any, files: any): any => {
-      resolve(files.map((file: any) => `http://${process.env.url}/${file}`))
+  const result: any = [];
+  await Promise.all([Object.values(files).forEach((file: any) => {
+    new Promise((resolve) => {
+      const imageName = `${ uid() }${ path.extname(file.name) }`;
+      result.push(`http://${process.env.url}/${ imageName }`);
+      resolve(fs.appendFile(`./public/${ imageName }`, file.data, ((err: any) => Error(err))))
     })
-  }).then((value: any) => res.send(value))
+  })])
+  res.send(result)
 }
