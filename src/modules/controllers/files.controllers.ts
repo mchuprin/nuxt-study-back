@@ -12,7 +12,7 @@ module.exports.getFiles = async (req: any, res: any) => {
 
 module.exports.saveFiles = async (req: any, res: any) => {
   const { files } = req;
-  const result: any = [];
+  const result = [];
   await Promise.all([Object.values(files).forEach((file: any) => {
     new Promise((resolve) => {
       const imageName = `${ uid() }${ path.extname(file.name) }`;
