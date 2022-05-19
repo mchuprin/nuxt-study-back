@@ -10,10 +10,24 @@ module.exports.getFiles = async (req: any, res: any) => {
     }).then((value: any) => res.send(value))
 }
 
+module.exports.deleteFiles = async (req: any, res: any) => {
+  const { files } = req.query;
+  try {
+    await Promise.all(files.split(',').forEach((file: any) => {
+      new Promise((resolve) => {
+        resolve(fs.unlink(`./public/${file.replace(`http://${process.env.url}/`, '')}`, ((err: any) => Error(err))));
+      })
+    }))
+    res.send('Deleted').status(204)
+  } catch (e) {
+    res.send('Server error').status(500)
+  }
+}
+
 module.exports.saveFiles = async (req: any, res: any) => {
   const { files } = req;
-  const result = [];
-  await Promise.all([Object.values(files).forEach((file) => {
+  const result: string[] = [];
+  await Promise.all([Object.values(files).forEach((file: any) => {
     new Promise((resolve) => {
       const imageName = `${ uid() }${ path.extname(file.name) }`;
       result.push(`http://${process.env.url}/${ imageName }`);
